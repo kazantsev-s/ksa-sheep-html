@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="icon" href="/static/favicon.ico" type="images/x-icon">
+    <title>Calendar</title>
+</head>
+<body>
+    <header class="header">
+        <!-- <div class="container"> -->
+            <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
+                {% for i in stat %}
+                <h5 class="my-0 mr-md-auto font-weight-normal"><img src="{{ url_for('static', filename='svg/sheep.png')}}" onerror="this.onerror=null; this.src='sheep.png'" alt="" style="vertical-align:middle" width="30" height="30"><strong>{{ i.cnt }}</strong> </h5>
+                {% endfor %}
+                <h5 class="my-0 mr-md-auto font-weight-normal">Выбор периода отчета</h5>
+                <nav class="my-2 my-md-0 mr-md-3">
+                    <a class="p-2 text-dark" href="/"><font color="#475c2a"><strong>Главная</strong></font></a>
+                    <a class="p-2 text-dark" href="/day_stat"><font color="#475c2a"><strong>За день</strong></font></a>
+                    {% if session['logged_in']%}
+                        <a class="p-2 text-dark" href="/import_table"><font color="#475c2a"><strong>Загрузка в БД</strong></font></a>
+                    {% endif %}
+                    {% if session['user'] %}
+                        <a class="p-2 text-dark" href="/logout"><font color="#475c2a"><strong>Выход</strong></font></a>
+                    {% else %}
+                        <a class="p-2 text-dark" href="/login"><font color="#475c2a"><strong>Авторизация</strong></font></a>
+                    {% endif %}
+                </nav>
+        <!-- <a class="btn btn-outline-primary" href="#">GET</a> -->
+        </div>
+            <!-- </div> -->
+    </header>
+    <section>
+        <div class="container">
+    <form method="post">
+        <div class="row">
+            <div class="input-group input-group-lg">
+                <!-- <div class="input-group-prepend">
+                    <div class="col"><span class="input-group-text" id="inputGroup-sizing-lg">Введите начальную дату:</span></div>
+                </div> -->
+                &nbsp;&nbsp;<div class="col-2.5"><input type="date" id="dt_start" name="dt_start" value="{{ date_default }}" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg"></div>
+                &nbsp;
+                <div class="col-2.5"><input type="date" id="dt_end" name="dt_end" value="{{ date_default_end }}" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg"></div>
+                &nbsp;
+                <button type="submit" name="submit_btn"  class="btn btn-light" id="asses_but" name="asses_but">
+                    <img src="{{ url_for('static', filename='svg/assessment-24px.svg')}}" onerror="this.onerror=null; this.src='assessment-24px.png'" alt="" style="vertical-align:middle" >
+                </button>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="input-group input-group-lg">
+                <!-- <div class="input-group-prepend">
+                    <div class="col-12"><span class="input-group-text" id="inputGroup-sizing-lg">Введите конечную дату:</span></div>
+                </div> -->
+            </div>
+        </div>
+            <!-- <br><input type="submit" name="submit_btn"  class="btn btn-success" value="Получить"> -->
+            <!-- <label for="dt_start">Введите начальную дату:</label>
+            <input type="date" id="dt_start" name="dt_start" value="{{ date_default }}">
+            <br><label for="dt_end">Введите конечную дату:&nbsp;</label>
+            <input type="date" id="dt_end" name="dt_end" value="{{ date_default_end }}"> -->
+    </form>
+
+
+    <form method="get">
+        {% for message_wrong_date in messages_wrong_date %}
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <strong>Ошибка!</strong>{{ message_wrong_date }} Дата конца раньше, чем дата начала!
+                <button class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
+    </form>
+    <form method="get">
+        {% for message_empty_rows in messages_empty_rows %}
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                {{ message_emty_rows }} Статистика за этот период отсутствует!
+                <button class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
+    </form>
+
+
+        <canvas id="myChart"></canvas>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.js"></script>
+        <!-- <script src="graphics.js"></script> -->
+        <script>
+        {% if check_graf %}
+            var ctx = document.getElementById('myChart').getContext('2d');
+            var utro_arr = [];
+            var vecher_arr = [];
+            var date_arr = [];
+
+            var utro_arr = [];
+            {% for ii in date_list %}
+                date_arr.push('{{ ii.date_req }}');
+            {% endfor %}
+
+            {% for ii in utrom %}
+                utro_arr.push('{{ ii.cnt }}');
+            {% endfor %}
+
+            {% for ii in vecher %}
+                vecher_arr.push('{{ ii.cnt }}');
+            {% endfor %}
+
+            var chart = new Chart(ctx, {
+                type: 'bar',
+
+                data: {
+                    labels: date_arr,
+                    datasets: [
+                        {
+                            label: 'Утром',
+                            backgroundColor: 'rgb(98, 204, 147)', // 'rgb(224, 224, 150)'
+                            borderColor: 'rgb(45, 196, 116)', // 'rgb(242, 242, 92)'
+                            data: utro_arr,
+                        },
+                        {
+                            label: 'Вечером',
+                            backgroundColor: 'rgb(224, 224, 150)',
+                            borderColor: 'rgb(242, 242, 92)',
+                            data: vecher_arr,
+                        }
+                        ]
+
+                },
+
+                options: {
+                    scales: {
+                    yAxes: [ {
+                    ticks: {
+                       min: 0
+                    }
+                } ]
+            }}
+            });
+        {% endif %}
+        </script>
+            {% if check_graf %}
+            <div class="row">
+                <div class="col-0">
+                </div>
+                <div class="col-12">
+
+                <table class="table table-hover table-borderless">
+
+                    <thead>
+                        <tr>
+                            <th scope="col"> Дата</th>
+                            <th scope="col"><div align="center">Утро</div></th>
+                            <th scope="col"><div align="center">Вечер</div></th>
+                        </tr>
+                      </thead>
+                    {% for ii in range(lenlist) %}
+                    <tbody>
+                        <tr>
+                            <td>
+                                    {{ date_list1[ii] }}
+                            </td>
+                            <td align="center" valign="middle">
+                                    {{ utrom0[ii] }}
+                            </td>
+                            <td {% if colordif[ii] == 1 %} class="table-danger" {% elif colordif[ii] == 2 %} class="table-warning" {% elif colordif[ii] == 0 %} class="table-success" {% endif %} align="center" valign="middle">
+                                    {{ vecher1[ii] }} ({{vecher1[ii] - utrom0[ii]}})
+                            </td>
+                        </tr>
+
+                    </tbody>
+                    {% endfor %}
+                </table>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </section>
+
+</body>
+</html>

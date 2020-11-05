@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="icon" href="/static/favicon.ico" type="images/x-icon">
+    <title>Login</title>
+</head>
+<body>
+    <header class="header">
+        <!-- <div class="container"> -->
+            <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
+                {% for i in stat %}
+                <h5 class="my-0 mr-md-auto font-weight-normal"><img src="{{ url_for('static', filename='svg/sheep.png')}}" onerror="this.onerror=null; this.src='sheep.png'" alt="" style="vertical-align:middle" width="30" height="30"><strong>{{ i.cnt }}</strong></h5>
+                {% endfor %}
+                <h5 class="my-0 mr-md-auto font-weight-normal">Авторизация</h5>
+                <nav class="my-2 my-md-0 mr-md-3">
+                <a class="p-2 text-dark" href="/"><font color="#475c2a"><strong>Главная</strong></font></a>
+                <a class="p-2 text-dark" href="/day_stat"><font color="#475c2a"><strong>За день</strong></font></a>
+                <a class="p-2 text-dark" href="/calendar"><font color="#475c2a"><strong>За период</strong></font></a>
+                {% if session['logged_in'] %}
+                    <a class="p-2 text-dark" href="/import_table"><font color="#475c2a"><strong>Загрузка в БД</strong></font></a>
+                {% endif %}
+                {% if session['user'] or session['logged_in']%}
+                    <a class="p-2 text-dark" href="/logout"><font color="#475c2a"><strong>Выход</strong></font></a>
+                {% endif %}
+                </nav>
+        <!-- <a class="btn btn-outline-primary" href="#">GET</a> -->
+        </div>
+            <!-- </div> -->
+    </header>
+
+    <section>
+    <div class="container">
+    <form method="post">
+            {% if session['logged_in'] %}
+                <fieldset disabled>
+            {% endif %}
+            {% if session['user'] %}
+                <fieldset disabled>
+            {% endif %}
+
+<!--            <div class="col-3"><button type="submit" class="btn btn-warning">Регистрация</button></div>-->
+<!--            <div class="form-group">-->
+<!--                <div class="col-3">-->
+<!--                <label for="InputLogin1">Логин</label>-->
+<!--                <input type="text" class="form-control" id="InputLogin1">-->
+<!--                </div>-->
+<!--             </div>-->
+            <div class="form-group">
+                <div class="col-xl-3 col-lg-3 col-md-4 col-sm-5 col-6">
+                <label for="InputLogin1">Логин</label>
+                <input class="form-control" id="InputLogin1" type="text" name="InputLogin1">
+            </div>
+            </div>
+            <div class="form-group">
+                <div class="col-xl-3 col-lg-3 col-md-4 col-sm-5 col-6">
+                <label for="InputPassword1">Пароль</label>
+                <input type="password" class="form-control" id="InputPassword1" name="InputPassword1">
+                </div>
+            </div>
+            <div class="form-group form-check">
+                <div class="col-xl-3 col-lg-3 col-md-4 col-sm-5 col-6">
+                <input type="checkbox" class="form-check-input" id="remember" name="remember">
+                <label class="form-check-label" for="remember">Запомнить меня!</label>
+                </div>
+            </div>
+                <div class="col-xl-3 col-lg-3 col-md-4 col-sm-5 col-6"><button type="submit" class="btn btn-success">Войти</button></div>
+<!--            <style>-->
+<!--                    .line_shadow {-->
+<!--                        box-shadow: 0 0 50px rgba(0,0,0,0.5);-->
+<!--                    }-->
+<!--                </style>-->
+<!--                <div class="line_shadow">-->
+<!--                    <div class="col-2"><hr align="center" width="250" size="2" color="#e5e5e5"/></div>-->
+<!--                </div>-->
+
+
+<!--                <div class="col-4"><a href="/register" class="btn btn-warning">Регистрация</a></div>-->
+
+    </form>
+
+<br>
+
+    <form method="get">
+        {% for success_message in success_messages %}
+        <div class="col-12">
+
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                {{ success_message }} Вы успешно вошли в аккаунт!
+                <button class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    </form>
+
+
+    <form method="get">
+        {% for error_message in error_messages %}
+        <div class="col-12">
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <strong>Ошибка!</strong>{{ error_message }} Неверный логин или пароль!
+                <button class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    </form>
+
+    <form method="get">
+        {% for warning_message in warning_messages %}
+        <div class="col-12">
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <strong>Внимание!</strong>{{ warning_message }} Вам необъходимо войти в аккаунт!
+                <button class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    </form>
+
+    <form method="get">
+        {% for false_message in false_messages %}
+        <div class="col-12">
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <strong>Внимание!</strong>{{ false_message }} Неверный логин или пароль!
+                <button class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    </form>
+    </section>
+</body>
+</html>

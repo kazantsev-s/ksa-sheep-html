@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="278" height="83" viewBox="0 0 278 83">
+  <defs>
+    <filter id="Ellipse_2" x="155" y="40" width="41" height="43" filterUnits="userSpaceOnUse">
+      <feOffset dy="3" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feFlood flood-opacity="0.161"/>
+      <feComposite operator="in" in2="blur"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Ellipse_4" x="94" y="0" width="44" height="44" filterUnits="userSpaceOnUse">
+      <feOffset dy="3" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="3" result="blur-2"/>
+      <feFlood flood-opacity="0.161"/>
+      <feComposite operator="in" in2="blur-2"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Ellipse_3" x="0" y="0" width="43" height="44" filterUnits="userSpaceOnUse">
+      <feOffset dy="3" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="3" result="blur-3"/>
+      <feFlood flood-opacity="0.161"/>
+      <feComposite operator="in" in2="blur-3"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Ellipse_5" x="182" y="0" width="43" height="44" filterUnits="userSpaceOnUse">
+      <feOffset dy="3" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="3" result="blur-4"/>
+      <feFlood flood-opacity="0.161"/>
+      <feComposite operator="in" in2="blur-4"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Ellipse_6" x="52" y="40" width="42" height="43" filterUnits="userSpaceOnUse">
+      <feOffset dy="3" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="3" result="blur-5"/>
+      <feFlood flood-opacity="0.161"/>
+      <feComposite operator="in" in2="blur-5"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+  </defs>
+  <g id="Group_2" data-name="Group 2" transform="translate(-931.025 -197.229)">
+    <g transform="matrix(1, 0, 0, 1, 931.03, 197.23)" filter="url(#Ellipse_2)">
+      <g id="Ellipse_2-2" data-name="Ellipse 2" transform="translate(164 46)" fill="#f4ab76" stroke="#efb45c" stroke-width="1">
+        <ellipse cx="11.5" cy="12.5" rx="11.5" ry="12.5" stroke="none"/>
+        <ellipse cx="11.5" cy="12.5" rx="11" ry="12" fill="none"/>
+      </g>
+    </g>
+    <g transform="matrix(1, 0, 0, 1, 931.03, 197.23)" filter="url(#Ellipse_4)">
+      <g id="Ellipse_4-2" data-name="Ellipse 4" transform="translate(103 6)" fill="#fcf581" stroke="#f8ef59" stroke-width="1">
+        <circle cx="13" cy="13" r="13" stroke="none"/>
+        <circle cx="13" cy="13" r="12.5" fill="none"/>
+      </g>
+    </g>
+    <g transform="matrix(1, 0, 0, 1, 931.03, 197.23)" filter="url(#Ellipse_3)">
+      <g id="Ellipse_3-2" data-name="Ellipse 3" transform="translate(9 6)" fill="#fcc87c" stroke="#ffc672" stroke-width="1">
+        <ellipse cx="12.5" cy="13" rx="12.5" ry="13" stroke="none"/>
+        <ellipse cx="12.5" cy="13" rx="12" ry="12.5" fill="none"/>
+      </g>
+    </g>
+    <g transform="matrix(1, 0, 0, 1, 931.03, 197.23)" filter="url(#Ellipse_5)">
+      <g id="Ellipse_5-2" data-name="Ellipse 5" transform="translate(191 6)" fill="#aed68d" stroke="#99db63" stroke-width="1">
+        <ellipse cx="12.5" cy="13" rx="12.5" ry="13" stroke="none"/>
+        <ellipse cx="12.5" cy="13" rx="12" ry="12.5" fill="none"/>
+      </g>
+    </g>
+    <g transform="matrix(1, 0, 0, 1, 931.03, 197.23)" filter="url(#Ellipse_6)">
+      <g id="Ellipse_6-2" data-name="Ellipse 6" transform="translate(61 46)" fill="#f8947c" stroke="#f3927b" stroke-width="1">
+        <ellipse cx="12" cy="12.5" rx="12" ry="12.5" stroke="none"/>
+        <ellipse cx="12" cy="12.5" rx="11.5" ry="12" fill="none"/>
+      </g>
+    </g>
+    <text id="Баран" transform="translate(974.025 219.229)" fill="#707070" font-size="12" font-family="SegoeUI, Segoe UI"><tspan x="0" y="0">Баран</tspan></text>
+    <text id="Овца" transform="translate(1067.025 220.229)" fill="#707070" font-size="13" font-family="SegoeUI, Segoe UI"><tspan x="0" y="0">Овца</tspan></text>
+    <text id="Ягнёнок" transform="translate(1156.025 221.229)" fill="#707070" font-size="14" font-family="SegoeUI, Segoe UI"><tspan x="0" y="0">Ягнёнок</tspan></text>
+    <text id="Больной" transform="translate(1025.025 260.229)" fill="#707070" font-size="14" font-family="SegoeUI, Segoe UI"><tspan x="0" y="0">Больной</tspan></text>
+    <text id="Старый" transform="translate(1128.025 260.229)" fill="#707070" font-size="14" font-family="SegoeUI, Segoe UI"><tspan x="0" y="0">Старый</tspan></text>
+  </g>
+</svg>

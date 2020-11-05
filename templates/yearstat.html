@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/yearstat.css')}}">
+    <title>Year stat</title>
+</head>
+<body>
+<form method="post">
+    <div class="container">
+    <span class="choose">Выберите год</span>
+
+      <div class="dropdown">
+        <div class="select">
+          <span>Выберите год</span>
+          <i class="fa fa-chevron-left"></i>
+        </div>
+        <input type="hidden" name="yearstat" id="yearstat">
+        <ul class="dropdown-menu">
+          <li id="2020">2020</li>
+          <li id="2021">2021</li>
+          <li id="2022">2022</li>
+          <li id="2023">2023</li>
+          <li id="2024">2024</li>
+          <li id="2025">2025</li>
+          <li id="2026">2026</li>
+          <li id="2027">2027</li>
+          <li id="2028">2028</li>
+          <li id="2029">2029</li>
+          <li id="2030">2030</li>
+        </ul>
+      </div>
+        <br><input type="submit" name="submit_btn"  class="btn btn-success" value="Получить">
+</div>
+</form>
+    <script src="https://static.codepen.io/assets/common/stopExecutionOnTimeout-157cd5b220a5c80d4ff8e0e70ac069bffd87a61252088146915e8726e5d9f147.js"></script>
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+    <script id="rendered-js">
+        /*Dropdown Menu*/
+        $('.dropdown').click(function () {
+          $(this).attr('tabindex', 1).focus();
+          $(this).toggleClass('active');
+          $(this).find('.dropdown-menu').slideToggle(300);
+        });
+        $('.dropdown').focusout(function () {
+          $(this).removeClass('active');
+          $(this).find('.dropdown-menu').slideUp(300);
+        });
+        $('.dropdown .dropdown-menu li').click(function () {
+          $(this).parents('.dropdown').find('span').text($(this).text());
+          $(this).parents('.dropdown').find('input').attr('value', $(this).attr('id'));
+        });
+        /*End Dropdown Menu*/
+
+
+        $('.dropdown-menu li').click(function () {
+          var input = '<strong>' + $(this).parents('.dropdown').find('input').val() + '</strong>',
+          msg = '<span class="msg">Hidden input value: ';
+          $('.msg').html(msg + input + '</span>');
+        });
+        //# sourceURL=pen.js
+    </script>
+
+{% if check_graf %}
+    <canvas id="myChart"></canvas>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.js"></script>
+        <!-- <script src="graphics.js"></script> -->
+        <script>
+            var ctx = document.getElementById('myChart').getContext('2d');
+            var utro_arr = [];
+            var vecher_arr = [];
+            var date_arr = [];
+
+            var utro_arr = [];
+            {% for ii in utrom %}
+                utro_arr.push('{{ ii.cnt }}');
+                date_arr.push('{{ ii.date_req }}');
+            {% endfor %}
+
+            {% for ii in vecher %}
+                vecher_arr.push('{{ ii.cnt }}');
+            {% endfor %}
+
+            var chart = new Chart(ctx, {
+                type: 'bar',
+
+                data: {
+                    labels: date_arr,
+                    datasets: [
+                        {
+                            label: 'Утром',
+                            backgroundColor: 'rgb(98, 204, 147)', // 'rgb(224, 224, 150)'
+                            borderColor: 'rgb(45, 196, 116)', // 'rgb(242, 242, 92)'
+                            data: utro_arr,
+                        },
+                        {
+                            label: 'Вечером',
+                            backgroundColor: 'rgb(224, 224, 150)',
+                            borderColor: 'rgb(242, 242, 92)',
+                            data: vecher_arr,
+                        }
+                        ]
+
+                },
+
+                options: {
+                    scales: {
+                    yAxes: [ {
+                    ticks: {
+                       min: 0
+                    }
+                } ]
+            }}
+            });
+        </script>
+
+{% endif %}
+
+    </section>
+
+</body>
+</html>

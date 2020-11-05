@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="icon" href="/static/favicon.ico" type="images/x-icon">
+    <title>Import</title>
+</head>
+<body>
+    <style>
+        #asses_but {
+            box-shadow: 0px 3px 6px #00000026;
+        }
+    </style>
+    <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
+        {% for i in stat %}
+                <h5 class="my-0 mr-md-auto font-weight-normal"><img src="{{ url_for('static', filename='svg/sheep.png')}}" onerror="this.onerror=null; this.src='sheep.png'" alt="" style="vertical-align:middle" width="30" height="30"><strong>{{ i.cnt }}</strong></h5>
+                {% endfor %}
+                <h5 class="my-0 mr-md-auto font-weight-normal">Загрузка таблицы</h5>
+        <nav class="my-2 my-md-0 mr-md-3">
+            <a class="p-2 text-dark" href="/"><font color="#475c2a"><strong>Главная</strong></font></a>
+            <a class="p-2 text-dark" href="/day_stat"><font color="#475c2a"><strong>За день</strong></font></a>
+            <a class="p-2 text-dark" href="/calendar"><font color="#475c2a"><strong>За период</strong></font></a>
+            {% if session['logged_in'] or session['user'] %}
+                <a class="p-2 text-dark" href="/logout"><font color="#475c2a"><strong>Выход</strong></font></a>
+            {% else %}
+                <a class="p-2 text-dark" href="/login"><font color="#475c2a"><strong>Авторизация</strong></font></a>
+            {% endif %}
+        </nav>
+        <!-- <a class="btn btn-outline-primary" href="#">GET</a> -->
+    </div>
+    <div class="container">
+    <form method="post" enctype="multipart/form-data">
+            <form enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="file">Загрузите "xls/xlsx" файл:</label>
+                    <input type="file" class="form-control-file" id="file" name="file">
+                    <br>
+                </div>
+
+                    <label for="file">Выбор необходимого количества:</label>
+                    <br>
+                <div class="form-group form-check custom-control custom-checkbox">
+                    <input class="custom-control-input" type="checkbox" value="" id="defaultCheck1" onclick="terms_changed(this)" checked>
+                          <label class="custom-control-label" for="defaultCheck1">
+                            По умолчанию
+                          </label>
+                </div>
+                <label>Баранов:</label>    
+                <div class="form-group form-row">
+                    <div class="col-xl-2">
+                    <input class="form-control" type="text" value="{{ defolt_limit }}" name="limitform" id="limitform" disabled>
+                    </div>
+                </div>
+                <label>Овец:</label>    
+                <div class="form-group form-row">
+                    <div class="col-xl-2">
+                    <input class="form-control" type="text" value="{{ defolt_limit }}" name="limitform1" id="limitform1" disabled>
+                    </div>
+                </div>
+                <label>Ягнят:</label>    
+                <div class="form-group form-row">
+                    <div class="col-xl-2">
+                    <input class="form-control" type="text" value="{{ defolt_limit }}" name="limitform2" id="limitform2" disabled>
+                    </div>
+                </div>
+                <label>Больных:</label>    
+                <div class="form-group form-row">
+                    <div class="col-xl-2">
+                    <input class="form-control" type="text" value="{{ defolt_limit }}" name="limitform3" id="limitform3" disabled>
+                    </div>
+                </div>
+                <label>Старых:</label>    
+                <div class="form-group form-row">
+                    <div class="col-xl-2">
+                    <input class="form-control" type="text" value="{{ defolt_limit }}" name="limitform4" id="limitform4" disabled>
+                    </div>
+                </div>
+                <div class="form-group form-row">
+                    <div class="col-xl-2">
+                    <button type="submit" name="submit_btn"  class="btn btn-light" id="asses_but" name="asses_but">
+                        <img src="{{ url_for('static', filename='svg/get_app-24px.svg')}}" onerror="this.onerror=null; this.src='get_app-24px.png'" alt="" style="vertical-align:middle" >
+                    </button>
+                    </div>
+                </div>
+            </form>
+
+    </form>
+        <br>
+        <script>
+            var defolt_limit = {{ defolt_limit }};
+            function terms_changed(termsCheckBox){
+                if(termsCheckBox.checked){
+                    document.getElementById("limitform").disabled = true
+                    document.getElementById("limitform").value = defolt_limit;
+                    document.getElementById("limitform1").disabled = true
+                    document.getElementById("limitform1").value = defolt_limit;
+                    document.getElementById("limitform2").disabled = true
+                    document.getElementById("limitform2").value = defolt_limit;
+                    document.getElementById("limitform3").disabled = true
+                    document.getElementById("limitform3").value = defolt_limit;
+                    document.getElementById("limitform4").disabled = true
+                    document.getElementById("limitform4").value = defolt_limit;
+                } else{
+                    document.getElementById("limitform").disabled = false;
+                    document.getElementById("limitform1").disabled = false;
+                    document.getElementById("limitform2").disabled = false;
+                    document.getElementById("limitform3").disabled = false;
+                    document.getElementById("limitform4").disabled = false;
+                }
+            }
+        </script>
+    <form method="get">
+        {% for message_file_not_found in messages_file_not_found %}
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <strong>Ошибка!</strong> {{ message_file_not_found }} Файл ".xlsx/.xls" не найден! Попробуйте снова!
+                <button class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
+    </form>
+    <form method="get">
+        {% for message_success in messages_success %}
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                {{ message_success }} Данные в БД успешно загружены!
+                <!-- <button class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span> -->
+                </button>
+            </div>
+        {% endfor %}
+    </form>
+    <form method="get">
+        {% for message_bd_error in messages_bd_error %}
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <strong>Ошибка!</strong>{{ message_bd_error }} Не удалось подключиться к БД!
+                <button class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
+    </form>
+    <form method="get">
+        {% if result_set_check_01 %}
+        {% for message_general in messages_general %}
+            <div class="container">
+            <h2><span class="badge badge-success">{{ message_general }} Загружено:</span></h2>
+            <div class="types_text">
+        {% endfor %}
+          <ul class="list-group list-group-flush">
+      <table>
+        {% for el in result_set %}
+          <tr>
+              <li class="list-group-item">{{ el.type }}:&nbsp;&nbsp;<b>{{ el.count }}</b>&nbsp;баран(ов)</li>
+              <!-- <p><td><li>{{ el.type }}:&nbsp;&nbsp;</li></td></p>
+              <p><td>{{ el.count }}&nbsp;человек(а)</td></p> -->
+          </tr>
+        {% endfor %}
+      </table>
+    </ul>
+                {% endif %}
+    </form>
+    <form method="get">
+        {% for message_value_error in messages_value_error %}
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <strong>Ошибка!</strong>{{ message_value_error }} В данном ".xls/.xlsx" файле, имена всех ,или одних из этих колонок, отсутсвуют: (Time / TagID / Length / Ant / Cnt / RSSI). Или же, они были записаны неправильно!
+                <button class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
+    </form>
+    <form method="get">
+        {% for message_invalid_datetime_format in messages_invalid_datetime_format %}
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <strong>Ошибка!</strong>{{ message_invalid_datetime_format }}Не удалось корректно определить дату/время! Проверьте имя файла и его содержимое.
+                <button class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
+    </form>
+    <form method="get">
+        {% for message_type_error in messages_type_error %}
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <strong>Ошибка!</strong>{{ message_type_error }} Не удалось определить "type" по значениям в колонке "TagID"!
+                <button class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
+    </form>
+    <form method="get">
+        {% for message_file_upload_error in messages_file_upload_error %}
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <strong>Ошибка!</strong>{{ message_file_upload_error }} Не удалочь загрузить файл на сервер!
+                <button class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
+    </form>
+    </div>
+</body>
+</html>

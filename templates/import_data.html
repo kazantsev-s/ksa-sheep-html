@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="icon" href="/static/favicon.ico" type="images/x-icon">
+    <title>Import data</title>
+</head>
+<body>
+    <header class="header">
+        <!-- <div class="container"> -->
+            <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
+                {% for i in stat %}
+                <h5 class="my-0 mr-md-auto font-weight-normal"><img src="{{ url_for('static', filename='svg/sheep.png')}}" onerror="this.onerror=null; this.src='sheep.png'" alt="" style="vertical-align:middle" width="30" height="30"><strong>{{ i.cnt }}</strong></h5>
+                {% endfor %}
+                <h5 class="my-0 mr-md-auto font-weight-normal">Загруженные данные</h5>
+                <nav class="my-2 my-md-0 mr-md-3">
+                <a class="p-2 text-dark" href="/"><font color="#475c2a"><strong>Главная</strong></font></a>
+                <a class="p-2 text-dark" href="/day_stat"><font color="#475c2a"><strong>За день</strong></font></a>
+                <a class="p-2 text-dark" href="/import_table"><font color="#475c2a"><strong>Загрузка в БД</strong></font></a>
+                <a class="p-2 text-dark" href="/calendar"><font color="#475c2a"><strong>За период</strong></font></a>
+                <a class="p-2 text-dark" href="/logout"><font color="#475c2a"><strong>Выход</strong></font></a>
+                </nav>
+        <!-- <a class="btn btn-outline-primary" href="#">GET</a> -->
+        </div>
+            <!-- </div> -->
+    </header>
+    <section>
+        <div class="container">
+        <form method="get">
+            {% for message_success in messages_success %}
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    {{ message_success }} Данные в БД успешно загружены!
+                    <!-- <button class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span> -->
+                    </button>
+                </div>
+            {% endfor %}
+        </form>
+        <form method="get">
+            {% for message_success_del in messages_success_del %}
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    {{ message_success_del }} Данные успешно были перезаписаны!
+                    <!-- <button class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span> -->
+                    </button>
+                </div>
+            {% endfor %}
+        </form>
+        <form method="get">
+        {% if result_set_check_01 %}
+          <ul class="list-group list-group-flush">
+      <table class="table table-hover">
+          <tbody>
+        {% for el in result_set_1 %}
+        {% if el.type == 'Баран'%}
+          <tr {% if el.count < limit %} class="table-danger" {% elif el.count > limit %} class="table-warning" {% elif el.count == limit %} class="table-success" {% endif %}>
+              <td>{{ el.type }}:&nbsp;&nbsp;<b>{{ el.count }}</b>&nbsp;баран(ов)</td>
+              <!-- <p><td><li>{{ el.type }}:&nbsp;&nbsp;</li></td></p>
+              <p><td>{{ el.count }}&nbsp;человек(а)</td></p> -->
+          </tr>
+          {% elif el.type == 'Овца'%}
+          <tr {% if el.count < limit1 %} class="table-danger" {% elif el.count > limit1 %} class="table-warning" {% elif el.count == limit1 %} class="table-success" {% endif %}>
+              <td>{{ el.type }}:&nbsp;&nbsp;<b>{{ el.count }}</b>&nbsp;баран(ов)</td>
+              <!-- <p><td><li>{{ el.type }}:&nbsp;&nbsp;</li></td></p>
+              <p><td>{{ el.count }}&nbsp;человек(а)</td></p> -->
+          </tr>
+          {% elif el.type == 'Ягненок'%}
+          <tr {% if el.count < limit2 %} class="table-danger" {% elif el.count > limit2 %} class="table-warning" {% elif el.count == limit2 %} class="table-success" {% endif %}>
+              <td>{{ el.type }}:&nbsp;&nbsp;<b>{{ el.count }}</b>&nbsp;баран(ов)</td>
+              <!-- <p><td><li>{{ el.type }}:&nbsp;&nbsp;</li></td></p>
+              <p><td>{{ el.count }}&nbsp;человек(а)</td></p> -->
+          </tr>
+          {% elif el.type == 'Больной'%}
+          <tr {% if el.count < limit3 %} class="table-danger" {% elif el.count > limit3 %} class="table-warning" {% elif el.count == limit3 %} class="table-success" {% endif %}>
+              <td>{{ el.type }}:&nbsp;&nbsp;<b>{{ el.count }}</b>&nbsp;баран(ов)</td>
+              <!-- <p><td><li>{{ el.type }}:&nbsp;&nbsp;</li></td></p>
+              <p><td>{{ el.count }}&nbsp;человек(а)</td></p> -->
+          </tr>
+          {% elif el.type == 'Старый'%}
+          <tr {% if el.count < limit4 %} class="table-danger" {% elif el.count > limit4 %} class="table-warning" {% elif el.count == limit4 %} class="table-success" {% endif %}>
+              <td>{{ el.type }}:&nbsp;&nbsp;<b>{{ el.count }}</b>&nbsp;баран(ов)</td>
+              <!-- <p><td><li>{{ el.type }}:&nbsp;&nbsp;</li></td></p>
+              <p><td>{{ el.count }}&nbsp;человек(а)</td></p> -->
+          </tr>
+        {% endif %}  
+        {% endfor %}
+          </tbody>
+      </table>
+    </ul>
+        {% endif %}
+    </form>
+            <br>
+            <form method="get">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                          <th scope="col">Тип</th>
+                          <th scope="col">{{ day_y }}{{ month_html_y }} вечером</th>
+                          <th scope="col">{{ day_t }}{{ month_html }} утром</th>
+                          <th scope="col">{{ day_t }}{{ month_html }} вечером</th>
+                        </tr>
+                      </thead>
+                    <tbody>
+                    {% for el_b in result_set %}
+                        <tr>
+                            <td>
+                                {{ el_b.name }}
+                            </td>
+                            <td>
+                                {{ el_b.evening_yesterdate }}
+                            </td>
+                            <td {% if el_b.diff_yesterday < 0 %} class="table-danger" {% elif el_b.diff_yesterday>0 %} class="table-warning" {% elif el_b.diff_yesterday==0 %} class="table-success" {% endif %}>
+                                {{ el_b.morning_today }}&nbsp;({{ el_b.diff_yesterday }})
+                            </td>
+                            <td {% if el_b.diff_today < 0 %} class="table-danger" {% elif el_b.diff_today>0 %} class="table-warning" {% elif el_b.diff_today==0 %} class="table-success" {% endif %}>
+                                {{ el_b.evening_today }}&nbsp;({{ el_b.diff_today }})
+                            </td>
+                            <!-- <li class="list-group-item">{{ el_b.name }} {{ el_b.evening_yesterdate }}</li> -->
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </form>
+    </div>
+    </section>
+</body>
+</html>

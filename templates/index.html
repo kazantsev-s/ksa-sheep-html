@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="icon" href="/static/favicon.ico" type="images/x-icon">
+    <title>Stat</title>
+</head>
+<body>
+    <header class="header">
+        <!-- <div class="container"> -->
+            <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
+                {% for i in stat %}
+                <h5 class="my-0 mr-md-auto font-weight-normal"><img src="{{ url_for('static', filename='svg/sheep.png')}}" onerror="this.onerror=null; this.src='sheep.png'" alt="" style="vertical-align:middle" width="30" height="30"><strong>{{ i.cnt }}</strong></h5>
+                {% endfor %}
+                <h5 class="my-0 mr-md-auto font-weight-normal">Статистика за день</h5>
+                <nav class="my-2 my-md-0 mr-md-3">
+                <a class="p-2 text-dark" href="/"><font color="#475c2a"><strong>Главная</strong></font></a>
+                <a class="p-2 text-dark" href="/calendar"><font color="#475c2a"><strong>За период</strong></font></a>
+                {% if session['logged_in'] %}
+                    <a class="p-2 text-dark" href="/import_table"><font color="#475c2a"><strong>Загрузка в БД</strong></font></a>
+                {% endif %}
+                {% if session['user'] %}
+                    <a class="p-2 text-dark" href="/logout"><font color="#475c2a"><strong>Выход</strong></font></a>
+                {% else %}
+                    <a class="p-2 text-dark" href="/login"><font color="#475c2a"><strong>Авторизация</strong></font></a>
+                {% endif %}
+                </nav>
+        <!-- <a class="btn btn-outline-primary" href="#">GET</a> -->
+        </div>
+            <!-- </div> -->
+    </header>
+    <section>
+        <div class="container">
+        <form method="post">
+        <div class="row">
+            <div class="input-group input-group-lg">
+                <div class="input-group-prepend">
+                    <div class="col"><span class="input-group-text" id="inputGroup-sizing-lg">Дата:</span></div>
+                </div>
+                <div class="col-2.5"><input type="date" id="dt_report" name="dt_report" value="{{ date_default }}" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg"></div>
+                <p>&nbsp;</p>
+                <button type="submit" name="submit_btn"  class="btn btn-light" id="search_but" name="search_but">
+                    <img src="{{ url_for('static', filename='svg/search-24px.svg')}}" onerror="this.onerror=null; this.src='search-24px.png'" alt="" style="vertical-align:middle" >
+                </button>
+            </div>
+            <!-- <input type="submit" name="submit_btn"  class="btn btn-light" id="search_but" name="search_but"> -->
+        </div>
+            <br>
+            <form method="get">
+                <table class="table table-hover">
+                    <thead>
+                        {% if month_html %}
+                        <tr>
+                            <th scope="col"> </th>
+                            <th scope="col"><div align="center">{{ day_y }}{{ month_html_y }} вечером</div></th>
+                            <th scope="col"><div align="center">{{ day_t }}{{ month_html }} утром</div></th>
+                            <th scope="col"><div align="center">{{ day_t }}{{ month_html }} вечером</div></th>
+                        </tr>
+                        {% endif %}
+                      </thead>
+                    <tbody>
+                    {% for el_b in result_set %}
+                        <tr>
+                            <td>
+                                {% if el_b.name == 'Ягненок' %}
+                                <img src="{{ url_for('static', filename='svg/sheepbaby.png')}}" onerror="this.onerror=null; this.src='get_app-24px.png'" alt="" style="vertical-align:middle" widgt="50px" height="50px"> {{ el_b.name }}
+                                {% elif el_b.name == 'Овца' %}
+                                <img src="{{ url_for('static', filename='svg/sheepfemale.png')}}" onerror="this.onerror=null; this.src='get_app-24px.png'" alt="" style="vertical-align:middle" widgt="50px" height="50px"> {{ el_b.name }}
+                                {% elif el_b.name == 'Баран' %}
+                                <img src="{{ url_for('static', filename='svg/sheepmale.png')}}" onerror="this.onerror=null; this.src='get_app-24px.png'" alt="" style="vertical-align:middle" widgt="50px" height="50px"> {{ el_b.name }}
+                                {% elif el_b.name == 'Старый' %}
+                                <img src="{{ url_for('static', filename='svg/sheepold.png')}}" onerror="this.onerror=null; this.src='get_app-24px.png'" alt="" style="vertical-align:middle" widgt="50px" height="50px"> {{ el_b.name }}
+                                {% elif el_b.name == 'Больной' %}
+                                <img src="{{ url_for('static', filename='svg/sheepill.png')}}" onerror="this.onerror=null; this.src='get_app-24px.png'" alt="" style="vertical-align:middle" widgt="50px" height="50px"> {{ el_b.name }}
+                                {% endif %}
+                            </td>
+                            <td align="center" valign="middle">
+                                {{ el_b.evening_yesterdate }}
+                            </td>
+                            <td {% if el_b.diff_yesterday < 0 %} class="table-danger" {% elif el_b.diff_yesterday>0 %} class="table-warning" {% elif el_b.diff_yesterday==0 %} class="table-success" {% endif %} align="center" valign="middle">
+                                {{ el_b.morning_today }}&nbsp;({{ el_b.diff_yesterday }})
+                            </td>
+                            <td {% if el_b.diff_today < 0 %} class="table-danger" {% elif el_b.diff_today>0 %} class="table-warning" {% elif el_b.diff_today==0 %} class="table-success" {% endif %} align="center" valign="middle">
+                                {{ el_b.evening_today }}&nbsp;({{ el_b.diff_today }})
+                            </td>
+                            <!-- <li class="list-group-item">{{ el_b.name }} {{ el_b.evening_yesterdate }}</li> -->
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+
+
+
+
+
+
+    </form>
+    <form method="get">
+        {% for message_empty_rows in messages_empty_rows %}
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                {{ message_emty_rows }} Статистика за этот период отсутствует!
+                <button class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
+    </form>
+        <br>
+    </section>
+
+    </div>
+</body>
+</html>

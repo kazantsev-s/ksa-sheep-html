@@ -1,0 +1,895 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="icon" href="/static/favicon.ico" type="images/x-icon">
+    <link rel="stylesheet" href="static/css/animate.min.css">
+    <script src="static/js/wow.min.js"></script>
+         <script>
+            new WOW().init();
+         </script>
+    <title>Main</title>
+</head>
+<body>
+    <header class="header">
+        <!-- <div class="container"> -->
+            <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
+                {% if stat_str_e > 0 %}
+                <h5 class="my-0 mr-md-auto font-weight-normal"><img src="{{ url_for('static', filename='svg/sheep.png')}}" onerror="this.onerror=null; this.src='sheep.png'" alt="" style="vertical-align:middle" width="30" height="30"><strong>{{ stat_str_html_e }}</strong></h5>
+                {% else %}
+                <h5 class="my-0 mr-md-auto font-weight-normal"><img src="{{ url_for('static', filename='svg/sheep.png')}}" onerror="this.onerror=null; this.src='sheep.png'" alt="" style="vertical-align:middle" width="30" height="30"><strong>{{ stat_str }}</strong></h5>
+                {% endif %}
+<!--                <h5 class="my-0 mr-md-auto font-weight-normal"><img src="{{ url_for('static', filename='svg/sheep.png')}}" onerror="this.onerror=null; this.src='sheep.png'" alt="" style="vertical-align:middle" width="30" height="30"><strong>{{ stat_str }}</strong> </h5>-->
+                <h5 class="my-0 mr-md-auto font-weight-normal">Последняя статистика</h5>
+                <nav class="my-2 my-md-0 mr-md-3">
+                    <a class="p-2 text-dark" href="/day_stat"><font color="#475c2a"><strong>За день</strong></font></a>
+                    <a class="p-2 text-dark" href="/calendar"><font color="#475c2a"><strong>За период</strong></font></a>
+                    {% if session['logged_in'] %}
+                        <a class="p-2 text-dark" href="/import_table"><font color="#475c2a"><strong>Загрузка в БД</strong></font></a>
+                    {% endif %}
+
+                    {% if session['user'] %}
+                        <a class="p-2 text-dark" href="/logout"><font color="#475c2a"><strong>Выход</strong></font></a>
+                    {% else %}
+                        <a class="p-2 text-dark" href="/login"><font color="#475c2a"><strong>Авторизация</strong></font></a>
+                    {% endif %}
+                </nav>
+        <!-- <a class="btn btn-outline-primary" href="#">GET</a> -->
+        </div>
+            <!-- </div> -->
+    </header>
+    <section>
+    <div class="container">
+
+        <style>
+            div.text_time_m, div.text_time_e {
+                font-size: 40px;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                text-shadow: 0px 3px 6px rgb(168, 168, 168);
+                letter-spacing: 0px; /*rgb(184, 184, 184)*/
+            }
+            div.text_time_m {
+                color: #24A481
+            } 
+            div.text_time_e {
+                color: #A48624
+            }
+        </style>
+        <div class="wow zoomIn">
+            <div class="text_time_m">
+                <div class="col-xl-6 mx-auto">
+                    <p class="text-center">Утром {{ data_html }}</p>
+                </div>
+            </div>    
+        </div>
+        
+        <div class="row">
+<!--            <div class="col-6">-->
+
+<!--                <img src="{{ url_for('static', filename='svg/grap.png')}}" onerror="this.onerror=null; this.src='grap.png'" alt="" style="vertical-align:middle">-->
+<!--            </div>-->
+
+
+<div class="col-xl-4 col-sm-12 col-md-5 col-mx-auto col-lg-5">
+    <style>
+
+	/*.node circle {
+		cursor: pointer;
+	}*/
+
+	.node circle {
+	  fill: #fff;
+	  stroke: #2cc434; /* #2cc434 */
+	  stroke-width: 3px;
+	}
+
+	 /* .node text {
+	 font: 18px Arial;  Segoe UI
+    font-weight: 400; bold 
+    }*/
+
+    
+
+	.link {
+	  fill: none;
+	  stroke: #2cc434;
+	  stroke-width: 2px;
+	}
+
+    </style>
+
+
+
+
+<!-- load the d3.js library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+
+    <script>
+    var stat_int = {{ stat_int }}
+
+    var treeData = [
+      {
+        "name": {{ stat_str }},
+        "parent": "null",
+        "children": [
+          {
+            "name": "Баран: {{ baran_html }}",
+            "parent": "",
+          },
+          {
+            "name": "Овца: {{ ovca_html }}",
+            "parent": ""
+          },
+          {
+            "name": "Ягненок: {{ little_html }}",
+            "parent": "{{ stat_tr }}"
+          },
+          {
+            "name": "Больной: {{ bolnoy_html }}",
+            "parent": "{{ stat_tr }}"
+          },
+          {
+            "name": "Старый: {{ old_html }}",
+            "parent": "{{ stat_tr }}"
+          }
+        ]
+      }
+    ];
+
+    //treeData[0].style.fontWeight = bold;
+
+
+    // ************** Generate the tree diagram	 *****************
+    var margin = {top: 20, right: 20, bottom: 20, left: 60},
+        width = 320 - margin.right - margin.left,
+        height = 300 - margin.top - margin.bottom;
+
+    var i = 0,
+        duration = 750,
+        root;
+
+    var tree = d3.layout.tree()
+        .size([height, width]);
+
+    var diagonal = d3.svg.diagonal()
+        .projection(function(d) { return [d.y, d.x]; });
+
+    var svg = d3.select(".col-xl-4.col-sm-12.col-md-5.col-mx-auto.col-lg-5").append("svg")
+        .attr("width", width + margin.right + margin.left)
+        .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    root = treeData[0];
+    root.x0 = height / 2;
+    root.y0 = 0;
+
+    update(root);
+
+    d3.select(self.frameElement).style("height", "500px");
+
+    function update(source) {
+
+      // Compute the new tree layout.
+      var nodes = tree.nodes(root).reverse(),
+          links = tree.links(nodes);
+
+      // Normalize for fixed-depth.
+      nodes.forEach(function(d) { d.y = d.depth * 130; });
+
+      // Update the nodes…
+      var node = svg.selectAll("g.node")
+          .data(nodes, function(d) { return d.id || (d.id = ++i); });
+
+      // Enter any new nodes at the parent's previous position.
+      var nodeEnter = node.enter().append("g")
+          .attr("class", "node")
+          .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; });
+          //.on("click", click);
+
+      nodeEnter.append("circle")
+          .attr("r", 1e-6)
+          .style("fill", function(d) { return d._children ? "#FFF" : "#FFF"; });
+
+
+          if (stat_int > 99) {
+
+                nodeEnter.append("text")             
+                    .attr("x", function(d) { return d.children || d._children ? 18 : 5; })
+                    .attr("dy", ".35em")
+                    .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
+                    .text(function(d) { return d.name; })
+                    .style("fill-opacity", 1e-6);
+          } else if (stat_int < 100) {
+            nodeEnter.append("text")             
+                .attr("x", function(d) { return d.children || d._children ? 13 : 5; })
+                .attr("dy", ".35em")
+                .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
+                .text(function(d) { return d.name; })
+                .style("fill-opacity", 1e-6);
+          } else if (stat_int < 10){
+            nodeEnter.append("text")             
+                .attr("x", function(d) { return d.children || d._children ? 8 : 5; })
+                .attr("dy", ".35em")
+                .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
+                .text(function(d) { return d.name; })
+                .style("fill-opacity", 1e-6);
+          }
+
+
+      // Transition nodes to their new position.
+      var nodeUpdate = node.transition()
+          .duration(duration)
+          .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
+
+      nodeUpdate.select("circle")
+          
+          .attr("r", function(d) { return d._children || d.children ? 50 : 0; })
+          //.attr("r", function(d) { return d.children ? 50 : 0; })
+          
+          .style("fill", function(d) { return d.children ? "#FFF" : "#FFF"; }); //.style("fill", function(d) { return d._children ? "#FFF" : "#AED68D"; });
+
+      nodeUpdate.select("text")
+          .style("fill-opacity", 1)
+          .style("fill", function(d) { return d.children ? "#27b724" : "black"; })
+          .style("font-weight", function(d) { return d.children ? "bold" : "normal"; })
+          .style("font", function(d) { return d.children ? "21px Arial" : "18px Arial"; });
+
+      // Transition exiting nodes to the parent's new position.
+      var nodeExit = node.exit().transition()
+          .duration(duration)
+          .attr("transform", function(d) { return "translate(" + source.y + "," + source.x + ")"; })
+          .remove();
+
+      nodeExit.select("circle")
+          .attr("r", 1e-6);
+
+      nodeExit.select("text")
+          .style("fill-opacity", 1e-6);
+
+      // Update the links…
+      var link = svg.selectAll("path.link")
+          .data(links, function(d) { return d.target.id; });
+
+      // Enter any new links at the parent's previous position.
+      link.enter().insert("path", "g")
+          .attr("class", "link")
+          .attr("d", function(d) {
+            var o = {x: source.x0, y: source.y0};
+            return diagonal({source: o, target: o});
+          });
+
+      // Transition links to their new position.
+      link.transition()
+          .duration(duration)
+          .attr("d", diagonal);
+
+      // Transition exiting nodes to the parent's new position.
+      link.exit().transition()
+          .duration(duration)
+          .attr("d", function(d) {
+            var o = {x: source.x, y: source.y};
+            return diagonal({source: o, target: o});
+          })
+          .remove();
+
+      // Stash the old positions for transition.
+      nodes.forEach(function(d) {
+        d.x0 = d.x;
+        d.y0 = d.y;
+      });
+    }
+
+    // Toggle children on click.
+    //function click(d) {
+    //  if (d.children) {
+    //    d._children = d.children;
+    //    d.children = null;
+    //  } else {
+    //    d.children = d._children;
+    //    d._children = null;
+    //  }
+    //  update(d);
+    //}
+
+    </script>
+    </div>
+
+
+
+
+
+
+                <div class="col-xl-6 col-sm-12 col-md-7 float-md-right col-lg-7">
+
+                  <style>
+                    #myChart {
+                      margin-top: 25px;
+                    }
+                    
+                    #legend2 {
+                      margin-top: 30px;
+                    }
+                    #legend_smm{
+                      margin-top: 20px
+                    }
+                    #legend_sm{
+                      margin-top: 20px
+                    }
+
+                  </style>
+        <canvas id="myChart"></canvas>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.js"></script>
+        <!-- <script src="graphics.js"></script> -->
+
+
+            <script>
+        var ctx = document.getElementById('myChart').getContext('2d');
+        var data_cnt = ['{{ cnt_list_html [0]}}', '{{ cnt_list_html [1]}}', '{{ cnt_list_html [2]}}', '{{ cnt_list_html [3]}}', '{{ cnt_list_html [4]}}'];
+            var myPieChart = new Chart(ctx, {
+                type: 'pie', // doughnut
+                
+                // var cnt_baran = {{ cnt_baran }};
+                // var cnt_ovca = {{ cnt_ovca }};
+                // var cnt_little = {{ cnt_little }};
+                // var cnt_bolnoy = {{ cnt_bolnoy }};
+                // var cnt_old = {{ cnt_old }};
+                // data_cnt.push(cnt_baran)
+                // data_cnt.push(cnt_ovca)
+                // data_cnt.push(cnt_little)
+                // data_cnt.push(cnt_bolnoy)
+                // data_cnt.push(cnt_old)
+                // data_cnt.push('{{ cnt_list_html[0] }}');
+                // data_cnt.push('{{ cnt_list_html[1] }}');
+                // data_cnt.push('{{ cnt_list_html[2] }}');
+                // data_cnt.push('{{ cnt_list_html[3] }}');
+                // data_cnt.push('{{ cnt_list_html[4] }}');
+                // data_cnt = {{cnt_list_html}}
+                // data_cnt.push({{ cnt_baran }}, {{ cnt_ovca }}, {{ cnt_little }})
+                // data_cnt.push({{ cnt_ovca }})
+                // data_cnt.push({{ cnt_little }})
+                // data_cnt.push({{ cnt_bolnoy }})
+                // data_cnt.push({{ cnt_old }})
+                
+
+                data: {
+                    labels: ['Баран', 'Овца', 'Ягненок', 'Больной', 'Старый'],
+                    datasets: [
+                        {
+                            label: 'Pie',
+                            //backgroundColor: ['rgb(98, 204, 147)', 'rgb(204, 98, 98)', 'rgb(204, 200, 98)', 'rgb(112, 98, 204)', 'rgb(98, 192, 204)'],
+                            // backgroundColor: ['#FDC97D', '#FBF489', '#B0D88F', '#68C398', '#5AC8C9'],
+                            // backgroundColor: ['#FDC97D', '#FBF489', '#fa8989', '#B0D88F','#5AC8C9'],
+                            //backgroundColor: ['#007BFF', '#28A745', '#DC3545', '#FFC107', '#17A2B8'],
+                            //backgroundColor: ['#F4AB76', '#FCC87C', '#FCF581', '#AED68D', '#F8947C'],
+                            backgroundColor: ['#FCC87C', '#FCF581', '#AED68D', '#F8947C', '#F4AB76'],
+                            // borderColor: ['rgb(98, 184, 147)', 'rgb(204, 78, 98)', 'rgb(204, 180, 98)', 'rgb(112, 78, 204)', 'rgb(98, 172, 204)'],
+                            borderColor: ['#0000', '#0000', '#0000', '#0000', '#0000'],
+                            borderWidth: [0, 0, 0, 0, 0],
+                            data: data_cnt//data_cnt//data_cnt[{{ cnt_baran }}, {{ cnt_ovca }}, {{ cnt_little }}, {{ cnt_bolnoy }}, {{ cnt_old }}]
+                        }
+
+                        ]
+
+                },
+
+                options: {
+                    animation: {
+                        duration: 2000,
+                        animateScale: true
+                    },
+                    legend: {
+                        display: false,
+                        //position: 'bottom',
+                        labels: {
+                            boxWidth: 30,
+
+                        }
+                    },
+                    cutoutPercentage: 20
+                }
+            });
+
+
+        </script>
+        </div>
+            <div class="col-xl-2 d-none d-xl-block">
+
+                <div class="wow zoomIn">
+                    <img src="{{ url_for('static', filename='svg/legend2.svg')}}" onerror="this.onerror=null; this.src='legend2.svg'" alt="" style="vertical-align:bottom" id="legend2">
+                </div>
+
+                </div>
+
+
+            <div class="col-lg-6 col-md-6 col-sm-3 col-1 col-mx-auto"></div> 
+
+
+
+            <div class="col-sm-2 d-md-none d-none d-lg-block d-xl-none col-lg-5 col-mx-auto">
+
+                <div class="wow zoomIn">
+                    <img src="{{ url_for('static', filename='svg/legend_sm.svg')}}" onerror="this.onerror=null; this.src='legend_sm.svg'" alt="" style="vertical-align:bottom" id="legend_sm">
+                </div>
+
+                </div>
+
+            <div class="col-sm-none d-md-block d-none d-lg-none d-xl-none col-md-6 col-mx-auto">
+
+                <div class="wow zoomIn">
+                    <img src="{{ url_for('static', filename='svg/legend_md.svg')}}" onerror="this.onerror=null; this.src='legend_md.svg'" alt="" style="vertical-align:bottom" id="legend_md">
+                </div>
+
+                </div>    
+
+            <div class="col-sm-9 d-md-none d-sm-block col-11 col-mx-auto">
+
+                <div class="wow zoomIn">
+                    <img src="{{ url_for('static', filename='svg/legend_smm.svg')}}" onerror="this.onerror=null; this.src='legend_smm.svg'" alt="" style="vertical-align:bottom" id='legend_smm'>
+                </div>
+
+                </div>        
+
+<!--        <script>-->
+<!--        var ctx = document.getElementById('myChart').getContext('2d');-->
+<!--             var chart = new Chart(ctx, {-->
+<!--                type: 'bar',-->
+
+<!--                data: {-->
+<!--                    labels: [22, 33, 40],-->
+<!--                    datasets: [-->
+<!--                        {-->
+<!--                            label: 'Утром',-->
+<!--                            backgroundColor: 'rgb(98, 204, 147)', // 'rgb(224, 224, 150)'-->
+<!--                            borderColor: 'rgb(45, 196, 116)', // 'rgb(242, 242, 92)'-->
+<!--                            data: [26, 66, 17],-->
+<!--                        }-->
+<!--                        ]-->
+
+<!--                },-->
+
+<!--                options: {-->
+<!--                    scales: {-->
+<!--                    yAxes: [ {-->
+<!--                    ticks: {-->
+<!--                       min: 0-->
+<!--                    }-->
+<!--                } ]-->
+<!--            }}-->
+<!--            });-->
+<!--        </script>-->
+</div>
+
+        <br>
+        {% if evening_html_check %}
+        <div class="wow zoomIn">
+            <hr size="30">
+        </div>
+        
+        <br>
+
+        
+        <div class="wow zoomIn">
+            <div class="text_time_e">
+                <div class="col-xl-6 mx-auto">
+                    <p class="text-center">Вечером {{ data_html }}</p>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+
+            
+<!--            <div class="col-6">-->
+
+<!--                <img src="{{ url_for('static', filename='svg/grap.png')}}" onerror="this.onerror=null; this.src='grap.png'" alt="" style="vertical-align:middle">-->
+<!--            </div>-->
+
+
+<div class="test col-xl-4 col-sm-12 col-md-5 col-mx-auto col-lg-5">
+    <style>
+
+	/*.node circle {
+		cursor: pointer;
+	}*/
+
+	.node circle {
+	  fill: #fff;
+	  stroke: #2cc434; /* #2cc434 */
+	  stroke-width: 3px;
+	}
+
+	 /* .node text {
+	 font: 18px Arial;  Segoe UI
+    font-weight: 400; bold
+    }*/
+
+
+
+	.link {
+	  fill: none;
+	  stroke: #2cc434;
+	  stroke-width: 2px;
+	}
+
+    </style>
+
+
+
+
+<!-- load the d3.js library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+
+    <script>
+    var stat_int_e = {{ stat_int_e }}
+
+    var treeData = [
+      {
+        "name": {{ stat_str_e }},
+        "parent": "null",
+        "children": [
+          {
+            "name": "Баран: {{ baran_html_e }}",
+            "parent": "",
+          },
+          {
+            "name": "Овца: {{ ovca_html_e }}",
+            "parent": ""
+          },
+          {
+            "name": "Ягненок: {{ little_html_e }}",
+            "parent": "{{ stat_tr }}"
+          },
+          {
+            "name": "Больной: {{ bolnoy_html_e }}",
+            "parent": "{{ stat_tr }}"
+          },
+          {
+            "name": "Старый: {{ old_html_e }}",
+            "parent": "{{ stat_tr }}"
+          }
+        ]
+      }
+    ];
+
+    //treeData[0].style.fontWeight = bold;
+
+
+    // ************** Generate the tree diagram	 *****************
+    var margin = {top: 20, right: 20, bottom: 20, left: 60},
+        width = 320 - margin.right - margin.left,
+        height = 300 - margin.top - margin.bottom;
+
+    var i = 0,
+        duration = 750,
+        root;
+
+    var tree = d3.layout.tree()
+        .size([height, width]);
+
+    var diagonal = d3.svg.diagonal()
+        .projection(function(d) { return [d.y, d.x]; });
+
+    var svg = d3.select(".test.col-xl-4.col-sm-12.col-md-5.col-mx-auto.col-lg-5").append("svg")
+        .attr("width", width + margin.right + margin.left)
+        .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    root = treeData[0];
+    root.x0 = height / 2;
+    root.y0 = 0;
+
+    update(root);
+
+    d3.select(self.frameElement).style("height", "500px");
+
+    function update(source) {
+
+      // Compute the new tree layout.
+      var nodes = tree.nodes(root).reverse(),
+          links = tree.links(nodes);
+
+      // Normalize for fixed-depth.
+      nodes.forEach(function(d) { d.y = d.depth * 130; });
+
+      // Update the nodes…
+      var node = svg.selectAll("g.node")
+          .data(nodes, function(d) { return d.id || (d.id = ++i); });
+
+      // Enter any new nodes at the parent's previous position.
+      var nodeEnter = node.enter().append("g")
+          .attr("class", "node")
+          .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; });
+          //.on("click", click);
+
+      nodeEnter.append("circle")
+          .attr("r", 1e-6)
+          .style("fill", function(d) { return d._children ? "#FFF" : "#FFF"; });
+
+          if (stat_int_e > 99) {
+
+            nodeEnter.append("text")             
+                .attr("x", function(d) { return d.children || d._children ? 18 : 5; })
+                .attr("dy", ".35em")
+                .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
+                .text(function(d) { return d.name; })
+                .style("fill-opacity", 1e-6);
+      } else if (stat_int_e < 100) {
+        nodeEnter.append("text")             
+            .attr("x", function(d) { return d.children || d._children ? 13 : 5; })
+            .attr("dy", ".35em")
+            .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
+            .text(function(d) { return d.name; })
+            .style("fill-opacity", 1e-6);
+      } else if (stat_int_e < 10) {
+        nodeEnter.append("text")             
+            .attr("x", function(d) { return d.children || d._children ? 8 : 5; })
+            .attr("dy", ".35em")
+            .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
+            .text(function(d) { return d.name; })
+            .style("fill-opacity", 1e-6);
+      }
+
+      // Transition nodes to their new position.
+      var nodeUpdate = node.transition()
+          .duration(duration)
+          .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
+
+      nodeUpdate.select("circle")
+
+          .attr("r", function(d) { return d._children || d.children ? 50 : 0; })
+          //.attr("r", function(d) { return d.children ? 50 : 0; })
+
+          .style("fill", function(d) { return d.children ? "#FFF" : "#FFF"; }); //.style("fill", function(d) { return d._children ? "#FFF" : "#AED68D"; });
+
+      nodeUpdate.select("text")
+          .style("fill-opacity", 1)
+          .style("fill", function(d) { return d.children ? "#27b724" : "black"; })
+          .style("font-weight", function(d) { return d.children ? "bold" : "normal"; })
+          .style("font", function(d) { return d.children ? "21px Arial" : "18px Arial"; });
+
+      // Transition exiting nodes to the parent's new position.
+      var nodeExit = node.exit().transition()
+          .duration(duration)
+          .attr("transform", function(d) { return "translate(" + source.y + "," + source.x + ")"; })
+          .remove();
+
+      nodeExit.select("circle")
+          .attr("r", 1e-6);
+
+      nodeExit.select("text")
+          .style("fill-opacity", 1e-6);
+
+      // Update the links…
+      var link = svg.selectAll("path.link")
+          .data(links, function(d) { return d.target.id; });
+
+      // Enter any new links at the parent's previous position.
+      link.enter().insert("path", "g")
+          .attr("class", "link")
+          .attr("d", function(d) {
+            var o = {x: source.x0, y: source.y0};
+            return diagonal({source: o, target: o});
+          });
+
+      // Transition links to their new position.
+      link.transition()
+          .duration(duration)
+          .attr("d", diagonal);
+
+      // Transition exiting nodes to the parent's new position.
+      link.exit().transition()
+          .duration(duration)
+          .attr("d", function(d) {
+            var o = {x: source.x, y: source.y};
+            return diagonal({source: o, target: o});
+          })
+          .remove();
+
+      // Stash the old positions for transition.
+      nodes.forEach(function(d) {
+        d.x0 = d.x;
+        d.y0 = d.y;
+      });
+    }
+
+    // Toggle children on click.
+    //function click(d) {
+    //  if (d.children) {
+    //    d._children = d.children;
+    //    d.children = null;
+    //  } else {
+    //    d.children = d._children;
+    //    d._children = null;
+    //  }
+    //  update(d);
+    //}
+
+    </script>
+    </div>
+
+
+
+
+
+
+                <div class="col-xl-6 col-sm-12 col-md-7 float-md-right col-lg-7">
+
+                  <style>
+                    #myChart_e {
+                      margin-top: 25px;
+                    }
+
+                    #legend2 {
+                      margin-top: 30px;
+                    }
+                    #legend_smm{
+                      margin-top: 20px
+                    }
+                    #legend_sm{
+                      margin-top: 20px
+                    }
+
+                  </style>
+        <canvas id="myChart_e"></canvas>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.js"></script>
+        <!-- <script src="graphics.js"></script> -->
+
+
+            <script>
+        var ctx = document.getElementById('myChart_e').getContext('2d');
+        var data_cnt = ['{{ cnt_list_html_e [0]}}', '{{ cnt_list_html_e [1]}}', '{{ cnt_list_html_e [2]}}', '{{ cnt_list_html_e [3]}}', '{{ cnt_list_html_e [4]}}'];
+            var myPieChart = new Chart(ctx, {
+                type: 'pie', // doughnut
+
+                // var cnt_baran = {{ cnt_baran }};
+                // var cnt_ovca = {{ cnt_ovca }};
+                // var cnt_little = {{ cnt_little }};
+                // var cnt_bolnoy = {{ cnt_bolnoy }};
+                // var cnt_old = {{ cnt_old }};
+                // data_cnt.push(cnt_baran)
+                // data_cnt.push(cnt_ovca)
+                // data_cnt.push(cnt_little)
+                // data_cnt.push(cnt_bolnoy)
+                // data_cnt.push(cnt_old)
+                // data_cnt.push('{{ cnt_list_html[0] }}');
+                // data_cnt.push('{{ cnt_list_html[1] }}');
+                // data_cnt.push('{{ cnt_list_html[2] }}');
+                // data_cnt.push('{{ cnt_list_html[3] }}');
+                // data_cnt.push('{{ cnt_list_html[4] }}');
+                // data_cnt = {{cnt_list_html}}
+                // data_cnt.push({{ cnt_baran }}, {{ cnt_ovca }}, {{ cnt_little }})
+                // data_cnt.push({{ cnt_ovca }})
+                // data_cnt.push({{ cnt_little }})
+                // data_cnt.push({{ cnt_bolnoy }})
+                // data_cnt.push({{ cnt_old }})
+
+
+                data: {
+                    labels: ['Баран', 'Овца', 'Ягненок', 'Больной', 'Старый'],
+                    datasets: [
+                        {
+                            label: 'Pie',
+                            //backgroundColor: ['rgb(98, 204, 147)', 'rgb(204, 98, 98)', 'rgb(204, 200, 98)', 'rgb(112, 98, 204)', 'rgb(98, 192, 204)'],
+                            // backgroundColor: ['#FDC97D', '#FBF489', '#B0D88F', '#68C398', '#5AC8C9'],
+                            // backgroundColor: ['#FDC97D', '#FBF489', '#fa8989', '#B0D88F','#5AC8C9'],
+                            //backgroundColor: ['#007BFF', '#28A745', '#DC3545', '#FFC107', '#17A2B8'],
+                            //backgroundColor: ['#F4AB76', '#FCC87C', '#FCF581', '#AED68D', '#F8947C'],
+                            backgroundColor: ['#FCC87C', '#FCF581', '#AED68D', '#F8947C', '#F4AB76'],
+                            // borderColor: ['rgb(98, 184, 147)', 'rgb(204, 78, 98)', 'rgb(204, 180, 98)', 'rgb(112, 78, 204)', 'rgb(98, 172, 204)'],
+                            borderColor: ['#0000', '#0000', '#0000', '#0000', '#0000'],
+                            borderWidth: [0, 0, 0, 0, 0],
+                            data: data_cnt//data_cnt//data_cnt[{{ cnt_baran_e }}, {{ cnt_ovca_e }}, {{ cnt_little_e }}, {{ cnt_bolnoy_e }}, {{ cnt_old_e }}]
+                        }
+
+                        ]
+
+                },
+
+                options: {
+                    animation: {
+                        duration: 2000,
+                        animateScale: true
+                    },
+                    legend: {
+                        display: false,
+                        //position: 'bottom',
+                        labels: {
+                            boxWidth: 30,
+
+                        }
+                    },
+                    cutoutPercentage: 20
+                }
+            });
+
+
+        </script>
+        </div>
+            <div class="col-xl-2 d-none d-xl-block">
+
+                <div class="wow zoomIn">
+                    <img src="{{ url_for('static', filename='svg/legend2.svg')}}" onerror="this.onerror=null; this.src='legend2.svg'" alt="" style="vertical-align:bottom" id="legend2">
+                </div>
+
+                </div>
+
+
+            <div class="col-lg-6 col-md-6 col-sm-3 col-1 col-mx-auto"></div>
+
+
+
+            <div class="col-sm-2 d-md-none d-none d-lg-block d-xl-none col-lg-5 col-mx-auto">
+
+                <div class="wow zoomIn">
+                    <img src="{{ url_for('static', filename='svg/legend_sm.svg')}}" onerror="this.onerror=null; this.src='legend_sm.svg'" alt="" style="vertical-align:bottom" id="legend_sm">
+                </div>
+
+                </div>
+
+            <div class="col-sm-none d-md-block d-none d-lg-none d-xl-none col-md-6 col-mx-auto">
+
+                <div class="wow zoomIn">
+                    <img src="{{ url_for('static', filename='svg/legend_md.svg')}}" onerror="this.onerror=null; this.src='legend_md.svg'" alt="" style="vertical-align:bottom" id="legend_md">
+                </div>
+
+                </div>
+
+            <div class="col-sm-9 d-md-none d-sm-block col-11 col-mx-auto">
+
+                <div class="wow zoomIn">
+                    <img src="{{ url_for('static', filename='svg/legend_smm.svg')}}" onerror="this.onerror=null; this.src='legend_smm.svg'" alt="" style="vertical-align:bottom" id='legend_smm'>
+                </div>
+
+                </div>
+
+<!--        <script>-->
+<!--        var ctx = document.getElementById('myChart').getContext('2d');-->
+<!--             var chart = new Chart(ctx, {-->
+<!--                type: 'bar',-->
+
+<!--                data: {-->
+<!--                    labels: [22, 33, 40],-->
+<!--                    datasets: [-->
+<!--                        {-->
+<!--                            label: 'Утром',-->
+<!--                            backgroundColor: 'rgb(98, 204, 147)', // 'rgb(224, 224, 150)'-->
+<!--                            borderColor: 'rgb(45, 196, 116)', // 'rgb(242, 242, 92)'-->
+<!--                            data: [26, 66, 17],-->
+<!--                        }-->
+<!--                        ]-->
+
+<!--                },-->
+
+<!--                options: {-->
+<!--                    scales: {-->
+<!--                    yAxes: [ {-->
+<!--                    ticks: {-->
+<!--                       min: 0-->
+<!--                    }-->
+<!--                } ]-->
+<!--            }}-->
+<!--            });-->
+<!--        </script>-->
+</div>
+
+        {% endif %}
+
+
+
+
+
+
+        </div>
+
+    </section>
+
+
+</body>
+
+</html>

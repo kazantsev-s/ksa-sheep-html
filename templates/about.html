@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <title>Total stats</title>
+</head>
+<body>
+    <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
+        <h5 class="my-0 mr-md-auto font-weight-normal">Общая статистика</h5>
+        <nav class="my-2 my-md-0 mr-md-3">
+            <a class="p-2 text-dark" href="/calendar" target="Страница с выбором даты для получения нужных результатов">Статиситика по выбранной дате</a>
+            <a class="p-2 text-dark" href="/import_table" target="Страница с получением общей статистики">Загрузка в БД</a>
+        </nav>
+        <!-- <a class="btn btn-outline-primary" href="#">GET</a> -->
+    </div>
+    <div class="container">
+    <h2><span class="badge badge-success">Общая статистика:</span></h2>
+    <div class="types_text">
+        <br>
+    <ul class="list-group list-group-flush">
+      <table>
+        {% for el in result_set %}
+          <tr>
+              <li class="list-group-item">{{ el.type }}:&nbsp;&nbsp;{{ el.count }}&nbsp;баран(ов)</li>
+              <!-- <p><td><li>{{ el.type }}:&nbsp;&nbsp;</li></td></p>
+              <p><td>{{ el.count }}&nbsp;человек(а)</td></p> -->
+          </tr>
+        {% endfor %}
+      </table>
+    </ul>
+    </div>
+</div>
+</body>
+</html>
